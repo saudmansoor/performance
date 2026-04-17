@@ -185,9 +185,12 @@ let uSel = null;
 let freqSel = null;
 let open = {t2:false, t3:false, t4:false, t4res:false};
 let pollInterval = null;
+let t4Timer = null;
 
 // ── PERSISTENCE ──
 function save(){ localStorage.setItem('rts_v9', JSON.stringify(S)); }
+function saveT3Time(){ localStorage.setItem('rts_t3time', Date.now().toString()); }
+function getT3Time(){ return parseInt(localStorage.getItem('rts_t3time')||'0'); }
 function push(){
   if(!S) return;
   fetch(GAS,{method:'POST',mode:'no-cors',body:JSON.stringify(S),headers:{'Content-Type':'text/plain'}}).catch(()=>{});
@@ -376,6 +379,7 @@ function doT3(){
   if(uSel===null)             return showErr('e3','Please select your understanding level');
   setBtn('b3',true);
   S.t3 = lines*wpl; S.u3 = uSel; uSel=null;
+  saveT3Time();
   save(); push(); render();
 }
 
@@ -410,6 +414,8 @@ function editT1(){
   S.t1 = null; S.t2 = null; S.t3 = null; S.u2 = null; S.u3 = null;
   S.committed = false;
   open = {t2:false, t3:false, t4:false, t4res:false};
+  localStorage.removeItem('rts_t3time');
+  if(t4Timer){ clearTimeout(t4Timer); t4Timer=null; }
   save(); push(); render();
 }
 
@@ -417,6 +423,8 @@ function editT2(){
   S.t2 = null; S.t3 = null; S.u2 = null; S.u3 = null;
   S.committed = false;
   open = {t2:false, t3:false, t4:false, t4res:false};
+  localStorage.removeItem('rts_t3time');
+  if(t4Timer){ clearTimeout(t4Timer); t4Timer=null; }
   uSel = null;
   save(); push(); render();
 }
@@ -425,6 +433,8 @@ function editT3(){
   S.t3 = null; S.u3 = null;
   S.committed = false;
   open = {t2:false, t3:false, t4:false, t4res:false};
+  localStorage.removeItem('rts_t3time');
+  if(t4Timer){ clearTimeout(t4Timer); t4Timer=null; }
   uSel = null;
   save(); push(); render();
 }
@@ -748,9 +758,23 @@ function render(){
   }
 
   // ════════════════════════════════
-  //  T4 — 7-DAY BOOK FINISHING PLAN (auto-unlocked)
+  //  T4 — 7-DAY BOOK FINISHING PLAN (hidden for 90s after T3)
   // ════════════════════════════════
   if(S.t3!=null){
+    const t3Time = getT3Time();
+    // If no timestamp exists (old data), set one now so the 90s starts
+    if(!t3Time){ saveT3Time(); }
+    const elapsed = Date.now() - (t3Time || Date.now());
+    const t4Ready = elapsed >= 90000;
+
+    if(!t4Ready){
+      // Nothing visible — silently schedule re-render when 90s is up
+      if(t4Timer) clearTimeout(t4Timer);
+      const remaining = 90000 - elapsed;
+      t4Timer = setTimeout(()=>{ render(); scrollToLast(); }, remaining);
+    }
+
+    if(t4Ready){
     const t1h       = bt(S.t1, S.pages);
     const t3h       = bt(S.t3, S.pages);
     const multiplier= mx(S.t1, S.t3);
@@ -828,7 +852,8 @@ function render(){
     }
 
     html += '</div></div>';
-  }
+  } // end t4Ready
+  } // end S.t3!=null
 
   el.innerHTML = html;
 
