@@ -60,6 +60,8 @@ body{font-family:'Inter',sans-serif;background:var(--light);min-height:100vh;pad
 .btn-coral:disabled{background:#D1D5DB;color:#9CA3AF;cursor:not-allowed}
 .btn-green{background:var(--green);color:white}
 .btn-green:hover{background:#15803D}
+.edit-btn{display:inline-flex;align-items:center;gap:4px;background:none;border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;color:var(--gray);cursor:pointer;font-family:'Inter',sans-serif;margin-top:8px;transition:all 0.15s}
+.edit-btn:hover{background:#F9FAFB;color:var(--navy);border-color:var(--navy)}
 
 /* ── STAT TILES ── */
 .s2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
@@ -219,6 +221,7 @@ function fmtWeeks(totalMins, daysPerWeek, minsPerSession){
 function bt(wpm,pages){ return (pages*WPP)/wpm; }
 function gr(a,b){ return Math.round(((b-a)/a)*100); }
 function mx(a,b){ return (b/a).toFixed(1); }
+function esc(str){ return String(str).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 // ── T1 SPEED COMMENT ──
 function t1Comment(wpm){
@@ -334,6 +337,12 @@ function doSetup(){
   if(isNaN(pages)||pages<1) return showErr('e0','Please enter number of pages');
   setBtn('b0',true);
   S = {name, book, pages, readDays:freqSel, readMins:mins, t1:null, t2:null, t3:null, u2:null, u3:null};
+  // Restore test results if editing profile info
+  if(window._savedTests){
+    Object.assign(S, window._savedTests);
+    window._savedTests = null;
+    window._prefill = null;
+  }
   save(); push(); render();
 }
 
@@ -373,6 +382,51 @@ function doT3(){
 function doCommit(){
   S.committed = true;
   save(); push(); render(); scrollToLast();
+}
+
+function editSetup(){
+  // Store current state so we can restore test results after re-submit
+  window._savedTests = {t1:S.t1, t2:S.t2, t3:S.t3, u2:S.u2, u3:S.u3, committed:S.committed};
+  window._prefill = {name:S.name, book:S.book, pages:S.pages, readDays:S.readDays, readMins:S.readMins};
+  S = null;
+  save(); render();
+  // Pre-fill after render
+  setTimeout(()=>{
+    const pf = window._prefill;
+    if(pf){
+      document.getElementById('fn').value = pf.name||'';
+      document.getElementById('fb').value = pf.book||'';
+      document.getElementById('fp').value = pf.pages||'';
+      document.getElementById('fm').value = pf.readMins||'';
+      freqSel = pf.readDays;
+      document.querySelectorAll('.freq-tile').forEach(t => {
+        if(parseInt(t.dataset.val)===freqSel) t.classList.add('sel');
+      });
+    }
+  }, 50);
+}
+
+function editT1(){
+  S.t1 = null; S.t2 = null; S.t3 = null; S.u2 = null; S.u3 = null;
+  S.committed = false;
+  open = {t2:false, t3:false, t4:false, t4res:false};
+  save(); push(); render();
+}
+
+function editT2(){
+  S.t2 = null; S.t3 = null; S.u2 = null; S.u3 = null;
+  S.committed = false;
+  open = {t2:false, t3:false, t4:false, t4res:false};
+  uSel = null;
+  save(); push(); render();
+}
+
+function editT3(){
+  S.t3 = null; S.u3 = null;
+  S.committed = false;
+  open = {t2:false, t3:false, t4:false, t4res:false};
+  uSel = null;
+  save(); push(); render();
 }
 
 function openSec(sec){
@@ -451,6 +505,22 @@ function render(){
   }
 
   // ════════════════════════════════
+  //  PROFILE SUMMARY (editable)
+  // ════════════════════════════════
+  html +=
+    '<div class="card">'+
+      '<div class="card-hd" style="border-bottom:none;padding-bottom:0">'+
+        '<div>'+
+          '<div class="ctitle">👤 '+esc(S.name)+'</div>'+
+          '<div class="csub">📖 '+esc(S.book)+' · '+S.pages+' pages · '+S.readDays+'x/wk · '+S.readMins+' min/session</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="card-bd" style="padding-top:2px">'+
+        '<button class="edit-btn" onclick="editSetup()">✏️ Edit Info</button>'+
+      '</div>'+
+    '</div>';
+
+  // ════════════════════════════════
   //  T1 — BASE READING SPEED
   // ════════════════════════════════
   const t1done = S.t1 != null;
@@ -493,7 +563,9 @@ function render(){
       (fast
         ? '<div class="comment-box">🚀 You already read faster than most people in the room. Let\'s see how much further we push this today.</div>'
         : '<div class="comment-box">'+t1Comment(S.t1)+'</div>'
-      );
+      )+
+
+      '<button class="edit-btn" onclick="editT1()">✏️ Re-do Test 1</button>';
 
     // T2 unlock — coach controlled
     
@@ -582,7 +654,9 @@ function render(){
 
         '<div style="background:#F0F4FF;border-radius:8px;padding:10px 12px;font-size:12px;color:#374151;margin-top:8px">'+
           '🧠 Understanding: <strong>'+ul+'</strong>'+
-        '</div>';
+        '</div>'+
+
+        '<button class="edit-btn" onclick="editT2()">✏️ Re-do Test 2</button>';
     }
     html += '</div></div>';
   }
@@ -666,7 +740,9 @@ function render(){
 
         '<div style="background:#F0F4FF;border-radius:8px;padding:10px 12px;font-size:12px;color:#374151;margin-top:8px">'+
           '🧠 Understanding: <strong>'+ul3+'</strong>'+
-        '</div>';
+        '</div>'+
+
+        '<button class="edit-btn" onclick="editT3()">✏️ Re-do Test 3</button>';
     }
     html += '</div></div>';
   }
