@@ -587,17 +587,10 @@ function render(){
     html += '</div></div>';
   }
 
-  // T3 unlock — coach controlled (via GAS polling)
-  if(S.t2!=null && S.t3==null && !open.t3){
-    html += '<div class="card"><div class="card-bd" style="padding:16px 18px">'+
-      '<div style="text-align:center;padding:8px 0;font-size:12px;color:var(--gray)">⏳ Waiting for coach to start Test 3...</div>'+
-    '</div></div>';
-  }
-
   // ════════════════════════════════
-  //  T3 — AFTER DRILLS
+  //  T3 — AFTER DRILLS (auto-unlocked)
   // ════════════════════════════════
-  if(S.t2!=null && (S.t3!=null || open.t3)){
+  if(S.t2!=null){
     const t3done = S.t3 != null;
     html +=
       '<div class="card">'+
@@ -678,17 +671,10 @@ function render(){
     html += '</div></div>';
   }
 
-  // T4 unlock — coach controlled
-  if(S.t3!=null && !open.t4){
-    html += '<div class="card"><div class="card-bd" style="padding:16px 18px">'+
-      '<div style="text-align:center;padding:8px 0;font-size:12px;color:var(--gray)">⏳ Waiting for coach to reveal your 7-day plan...</div>'+
-    '</div></div>';
-  }
-
   // ════════════════════════════════
-  //  T4 — 7-DAY BOOK FINISHING PLAN
+  //  T4 — 7-DAY BOOK FINISHING PLAN (auto-unlocked)
   // ════════════════════════════════
-  if(S.t3!=null && open.t4){
+  if(S.t3!=null){
     const t1h       = bt(S.t1, S.pages);
     const t3h       = bt(S.t3, S.pages);
     const multiplier= mx(S.t1, S.t3);
