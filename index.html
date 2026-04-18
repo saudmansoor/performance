@@ -6,133 +6,51 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-
 body{
-  font-family:'DM Sans',sans-serif;
-  background:#faf7f2;
-  min-height:100vh;
-  color:#2d2418;
-  padding-bottom:env(safe-area-inset-bottom, 20px);
+  font-family:'DM Sans',sans-serif;background:#faf7f2;
+  min-height:100vh;color:#2d2418;
+  padding-bottom:env(safe-area-inset-bottom,20px);
 }
-
-.container{
-  max-width:440px;
-  margin:0 auto;
-  padding:24px 20px 80px;
-}
-
-.header{
-  text-align:center;
-  padding:20px 0 8px;
-}
+.container{max-width:440px;margin:0 auto;padding:24px 20px 80px}
+.header{text-align:center;padding:20px 0 8px}
 .header-icon{font-size:36px;margin-bottom:8px}
-.header h1{
-  font-family:'Fraunces',serif;
-  font-size:22px;font-weight:700;color:#2d2418;letter-spacing:-0.3px;
-}
+.header h1{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:#2d2418;letter-spacing:-0.3px}
 .header p{font-size:13px;color:#8a7e6b;margin-top:4px}
-
 .progress-wrap{display:flex;gap:6px;margin:20px 0 24px}
-.progress-dot{
-  flex:1;height:4px;border-radius:4px;background:#e4ddd2;
-  transition:background 0.4s ease,transform 0.3s ease;
-}
+.progress-dot{flex:1;height:4px;border-radius:4px;background:#e4ddd2;transition:background 0.4s,transform 0.3s}
 .progress-dot.active{background:#e8604c;transform:scaleY(1.2)}
 .progress-dot.done{background:#c9a96e}
-
-.card{
-  background:#fff;border-radius:16px;padding:28px 24px 32px;
-  box-shadow:0 1px 3px rgba(45,36,24,0.04),0 8px 24px rgba(45,36,24,0.06);
-  animation:slideUp 0.45s cubic-bezier(.22,.68,0,.98);
-  margin-bottom:20px;
-}
-@keyframes slideUp{
-  from{opacity:0;transform:translateY(16px)}
-  to{opacity:1;transform:translateY(0)}
-}
-
-.card-title{
-  font-family:'Fraunces',serif;font-size:18px;font-weight:700;
-  text-align:center;margin-bottom:6px;color:#2d2418;
-}
-.card-sub{
-  text-align:center;font-size:13px;color:#8a7e6b;
-  margin-bottom:20px;line-height:1.5;
-}
-
+.card{background:#fff;border-radius:16px;padding:28px 24px 32px;box-shadow:0 1px 3px rgba(45,36,24,0.04),0 8px 24px rgba(45,36,24,0.06);animation:slideUp 0.45s cubic-bezier(.22,.68,0,.98);margin-bottom:20px}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.card-title{font-family:'Fraunces',serif;font-size:18px;font-weight:700;text-align:center;margin-bottom:6px;color:#2d2418}
+.card-sub{text-align:center;font-size:13px;color:#8a7e6b;margin-bottom:20px;line-height:1.5}
 .input-group{margin-bottom:14px}
-.input-label{
-  font-size:12px;font-weight:600;color:#8a7e6b;
-  text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;display:block;
-}
-.input-field{
-  width:100%;padding:14px 16px;font-size:16px;
-  font-family:'DM Sans',sans-serif;
-  border:1.5px solid #e4ddd2;border-radius:12px;
-  background:#faf7f2;color:#2d2418;
-  transition:border-color 0.2s,box-shadow 0.2s;outline:none;
-  -webkit-appearance:none;
-}
-.input-field:focus{
-  border-color:#c9a96e;
-  box-shadow:0 0 0 3px rgba(201,169,110,0.15);background:#fff;
-}
+.input-label{font-size:12px;font-weight:600;color:#8a7e6b;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;display:block}
+.input-field{width:100%;padding:14px 16px;font-size:16px;font-family:'DM Sans',sans-serif;border:1.5px solid #e4ddd2;border-radius:12px;background:#faf7f2;color:#2d2418;transition:border-color 0.2s,box-shadow 0.2s;outline:none;-webkit-appearance:none}
+.input-field:focus{border-color:#c9a96e;box-shadow:0 0 0 3px rgba(201,169,110,0.15);background:#fff}
 .input-field::placeholder{color:#bfb5a3}
-
-.btn{
-  width:100%;padding:15px;margin-top:8px;margin-bottom:4px;font-size:15px;
-  font-family:'DM Sans',sans-serif;font-weight:600;
-  border:none;border-radius:12px;cursor:pointer;
-  transition:transform 0.15s,box-shadow 0.15s,background 0.2s;
-  -webkit-tap-highlight-color:transparent;
-}
+.btn{width:100%;padding:15px;margin-top:8px;margin-bottom:4px;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:600;border:none;border-radius:12px;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s,background 0.2s;-webkit-tap-highlight-color:transparent}
 .btn:active{transform:scale(0.97)}
-.btn-primary{
-  background:#e8604c;color:#fff;
-  box-shadow:0 4px 12px rgba(232,96,76,0.3);
-}
+.btn-primary{background:#e8604c;color:#fff;box-shadow:0 4px 12px rgba(232,96,76,0.3)}
 .btn-primary:hover{background:#d9523e;box-shadow:0 6px 16px rgba(232,96,76,0.35)}
-.btn-secondary{
-  background:transparent;color:#8a7e6b;
-  font-weight:500;font-size:13px;margin-top:4px;padding:10px;
-}
+.btn-secondary{background:transparent;color:#8a7e6b;font-weight:500;font-size:13px;margin-top:4px;padding:10px}
 .btn-secondary:hover{background:#f0ebe3}
-
 .result-block{text-align:center;padding:8px 0}
-.result-label{
-  font-size:12px;font-weight:600;color:#8a7e6b;
-  text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;
-}
-.result-value{
-  font-family:'Fraunces',serif;font-size:32px;
-  font-weight:800;color:#2d2418;line-height:1.2;
-}
+.result-label{font-size:12px;font-weight:600;color:#8a7e6b;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px}
+.result-value{font-family:'Fraunces',serif;font-size:32px;font-weight:800;color:#2d2418;line-height:1.2}
 .result-value.accent{color:#e8604c}
 .result-value.green{color:#3a8f5c}
-.result-unit{
-  font-family:'DM Sans',sans-serif;font-size:14px;
-  font-weight:500;color:#8a7e6b;
-}
-
+.result-unit{font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:#8a7e6b}
 .divider{height:1px;background:#e4ddd2;margin:16px 0}
-
-.insight-text{
-  font-size:14px;line-height:1.6;color:#5c5040;
-  text-align:center;padding:4px 0;
-}
+.insight-text{font-size:14px;line-height:1.6;color:#5c5040;text-align:center;padding:4px 0}
 .insight-text b{color:#2d2418}
-
-.chart-wrap{
-  display:flex;align-items:flex-end;justify-content:center;
-  gap:32px;height:140px;padding:0;margin-top:20px;
-}
+.chart-wrap{display:flex;align-items:flex-end;justify-content:center;gap:32px;height:140px;margin-top:20px}
 .bar-group{display:flex;flex-direction:column;align-items:center;gap:8px}
 .bar{width:48px;border-radius:8px 8px 4px 4px;transition:height 0.6s cubic-bezier(.22,.68,0,.98)}
 .bar-t1{background:#e4ddd2}
 .bar-t2{background:#3a8f5c}
 .bar-label{font-size:12px;font-weight:600;color:#8a7e6b}
 .bar-val{font-family:'Fraunces',serif;font-size:14px;font-weight:700;color:#2d2418}
-
 .compare{display:flex;gap:10px;margin:12px 0 4px}
 .compare-card{flex:1;padding:14px;border-radius:12px;text-align:center}
 .compare-old{background:#f5f0e8;border:1.5px solid #e4ddd2}
@@ -143,69 +61,43 @@ body{
 .compare-val{font-family:'Fraunces',serif;font-size:22px;font-weight:700}
 .compare-old .compare-val{color:#5c5040;text-decoration:line-through;text-decoration-color:#c9a96e}
 .compare-new .compare-val{color:#3a8f5c}
-
-.cta-card{
-  background:linear-gradient(135deg,#2d2418 0%,#4a3c2a 100%);
-  border-radius:16px;padding:28px 24px;text-align:center;
-  margin-top:16px;box-shadow:0 8px 24px rgba(45,36,24,0.2);
-  animation:slideUp 0.45s cubic-bezier(.22,.68,0,.98);
-}
+.cta-card{background:linear-gradient(135deg,#2d2418,#4a3c2a);border-radius:16px;padding:28px 24px;text-align:center;margin-top:16px;box-shadow:0 8px 24px rgba(45,36,24,0.2);animation:slideUp 0.45s cubic-bezier(.22,.68,0,.98)}
 .cta-card .result-label{color:#c9a96e}
 .cta-card .result-value{color:#fff}
 .cta-card .insight-text{color:#d4c9b8}
 .cta-card .insight-text b{color:#fff}
 .cta-emoji{font-size:36px;margin-bottom:12px}
-
 .loading-wrap{text-align:center;padding:40px 20px}
-.spinner{
-  width:32px;height:32px;border:3px solid #e4ddd2;
-  border-top-color:#e8604c;border-radius:50%;
-  animation:spin 0.7s linear infinite;margin:0 auto 16px;
-}
+.spinner{width:32px;height:32px;border:3px solid #e4ddd2;border-top-color:#e8604c;border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 16px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-text{font-size:14px;color:#8a7e6b}
-
 .input-row{display:flex;gap:10px}
 .input-row .input-group{flex:1}
-
-/* Waiting state */
 .waiting-card{text-align:center;padding:40px 20px}
 .waiting-icon{font-size:40px;margin-bottom:12px}
-.waiting-title{
-  font-family:'Fraunces',serif;font-size:18px;
-  font-weight:700;margin-bottom:6px;
-}
+.waiting-title{font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-bottom:6px}
 .waiting-sub{font-size:13px;color:#8a7e6b;line-height:1.5}
 .pulse{animation:pulse 2s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-
-.status-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  font-size:11px;font-weight:600;padding:6px 12px;
-  border-radius:20px;margin-bottom:16px;
-}
+.status-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:6px 12px;border-radius:20px;margin-bottom:16px}
 .status-online{background:#eef7f0;color:#3a8f5c}
 .status-dot{width:6px;height:6px;border-radius:50%;background:#3a8f5c;animation:pulse 2s infinite}
 </style>
 </head>
 <body>
 <div class="container">
-
 <div class="header">
   <div class="header-icon">📖</div>
   <h1>Reading Speed Tool</h1>
   <p>Discover how fast you can finish any book</p>
 </div>
-
 <div class="progress-wrap">
   <div class="progress-dot" id="p1"></div>
   <div class="progress-dot" id="p2"></div>
   <div class="progress-dot" id="p3"></div>
   <div class="progress-dot" id="p4"></div>
 </div>
-
 <div id="app"></div>
-
 </div>
 <script>
 // =============================================
@@ -220,7 +112,6 @@ let pollTimer = null;
 
 function bookTime(wpm, pages) { return (pages * WPP) / wpm; }
 function fmtHours(mins) { return (mins / 60).toFixed(1); }
-
 function setProgress(step) {
   for (let i = 1; i <= 4; i++) {
     let d = document.getElementById('p' + i);
@@ -231,29 +122,26 @@ function setProgress(step) {
 }
 
 // =============================================
-// 📡 API — Communicate with Google Sheet
+// 📡 API — All GET requests (no CORS issues)
 // =============================================
+function apiCall(params) {
+  const url = API_URL + '?' + new URLSearchParams(params).toString();
+  return fetch(url).then(r => r.json()).catch(e => {
+    console.log('API error:', e);
+    return null;
+  });
+}
 
 async function sendToSheet(data) {
-  try {
-    await fetch(API_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'submit', ...data })
-    });
-  } catch (e) { console.log('Send error:', e); }
+  await apiCall(data);
 }
 
 async function checkUnlock(step) {
-  try {
-    const r = await fetch(API_URL + '?action=status');
-    const d = await r.json();
-    return d[step] === true || d[step] === 'true';
-  } catch (e) {
-    console.log('Status check error:', e);
-    return false;
+  const d = await apiCall({ action: 'status' });
+  if (d && d[step] !== undefined) {
+    return d[step] === true;
   }
+  return false;
 }
 
 function stopPolling() {
@@ -264,11 +152,8 @@ function waitForUnlock(step, callback) {
   stopPolling();
   pollTimer = setInterval(async () => {
     const unlocked = await checkUnlock(step);
-    if (unlocked) {
-      stopPolling();
-      callback();
-    }
-  }, 3000); // Check every 3 seconds
+    if (unlocked) { stopPolling(); callback(); }
+  }, 3000);
 }
 
 function showWaiting(stepName, stepNum) {
@@ -283,9 +168,7 @@ function showWaiting(stepName, stepNum) {
   </div>`;
 }
 
-// =============================================
-// STEP 1 — Registration (always open)
-// =============================================
+// STEP 1
 function step1() {
   setProgress(1);
   document.getElementById("app").innerHTML = `
@@ -314,31 +197,21 @@ async function save1() {
   S.pages = +document.getElementById('pages').value;
   if (!S.name || !S.book || !S.pages) return;
 
-  // Show loading
   document.getElementById("app").innerHTML = `
   <div class="card"><div class="loading-wrap">
-    <div class="spinner"></div>
-    <div class="loading-text">Joining workshop…</div>
+    <div class="spinner"></div><div class="loading-text">Joining workshop…</div>
   </div></div>`;
 
-  // Send registration to Google Sheet
-  await sendToSheet({ name: S.name, book: S.book, pages: S.pages, step: 'registered' });
+  await sendToSheet({ action:'submit', name:S.name, book:S.book, pages:S.pages, step:'registered' });
 
-  // Check if T1 is unlocked
   const t1Open = await checkUnlock('t1');
   if (t1Open) { step2(); }
-  else {
-    showWaiting('Test 1', 2);
-    waitForUnlock('t1', step2);
-  }
+  else { showWaiting('Test 1', 2); waitForUnlock('t1', step2); }
 }
 
-// =============================================
-// STEP 2 — Test 1 (Baseline)
-// =============================================
+// STEP 2 — Test 1
 function step2() {
-  stopPolling();
-  setProgress(2);
+  stopPolling(); setProgress(2);
   document.getElementById("app").innerHTML = `
   <div class="card">
     <div style="text-align:center"><span class="status-badge status-online"><span class="status-dot"></span> Live Workshop</span></div>
@@ -365,8 +238,7 @@ async function save2() {
   S.t1 = l * w;
   let t = bookTime(S.t1, S.pages);
 
-  // Send T1 to Google Sheet
-  await sendToSheet({ name: S.name, t1: S.t1, step: 't1_done' });
+  await sendToSheet({ action:'submit', name:S.name, t1:S.t1, step:'t1_done' });
 
   document.getElementById("app").innerHTML = `
   <div class="card">
@@ -385,30 +257,18 @@ async function save2() {
     <button class="btn btn-secondary" onclick="redoT1()">↻ Redo Test 1</button>
   </div>`;
 }
-
 function redoT1() { S.t1 = null; step2(); }
 
 async function goToT2() {
-  document.getElementById("app").innerHTML = `
-  <div class="card"><div class="loading-wrap">
-    <div class="spinner"></div>
-    <div class="loading-text">Checking with coach…</div>
-  </div></div>`;
-
+  document.getElementById("app").innerHTML = `<div class="card"><div class="loading-wrap"><div class="spinner"></div><div class="loading-text">Checking with coach…</div></div></div>`;
   const t2Open = await checkUnlock('t2');
   if (t2Open) { step3(); }
-  else {
-    showWaiting('Test 2', 3);
-    waitForUnlock('t2', step3);
-  }
+  else { showWaiting('Test 2', 3); waitForUnlock('t2', step3); }
 }
 
-// =============================================
-// STEP 3 — Test 2 (Boosted)
-// =============================================
+// STEP 3 — Test 2
 function step3() {
-  stopPolling();
-  setProgress(3);
+  stopPolling(); setProgress(3);
   document.getElementById("app").innerHTML = `
   <div class="card">
     <div style="text-align:center"><span class="status-badge status-online"><span class="status-dot"></span> Live Workshop</span></div>
@@ -436,24 +296,15 @@ async function save3() {
   let gain = Math.round(((S.t2 - S.t1) / S.t1) * 100);
   let seconds = Math.round(60 / (S.t2 / S.t1));
 
-  // Send T2 to Google Sheet
-  await sendToSheet({ name: S.name, t2: S.t2, gain: gain, step: 't2_done' });
+  await sendToSheet({ action:'submit', name:S.name, t2:S.t2, gain:gain, step:'t2_done' });
 
   document.getElementById("app").innerHTML = `
   <div class="card">
     <div class="result-block">
       <div class="result-label">Speed Comparison</div>
       <div class="chart-wrap">
-        <div class="bar-group">
-          <div class="bar-val">${S.t1}</div>
-          <div class="bar bar-t1" id="bar1"></div>
-          <div class="bar-label">Before</div>
-        </div>
-        <div class="bar-group">
-          <div class="bar-val">${S.t2}</div>
-          <div class="bar bar-t2" id="bar2"></div>
-          <div class="bar-label">After</div>
-        </div>
+        <div class="bar-group"><div class="bar-val">${S.t1}</div><div class="bar bar-t1" id="bar1"></div><div class="bar-label">Before</div></div>
+        <div class="bar-group"><div class="bar-val">${S.t2}</div><div class="bar bar-t2" id="bar2"></div><div class="bar-label">After</div></div>
       </div>
     </div>
     <div class="divider"></div>
@@ -466,37 +317,24 @@ async function save3() {
     <button class="btn btn-primary" onclick="goToFinal()">Almost Done →</button>
     <button class="btn btn-secondary" onclick="redoT2()">↻ Redo Test 2</button>
   </div>`;
-
   requestAnimationFrame(() => {
     let max = Math.max(S.t1, S.t2);
-    document.getElementById('bar1').style.height = ((S.t1 / max) * 90) + 'px';
-    document.getElementById('bar2').style.height = ((S.t2 / max) * 90) + 'px';
+    document.getElementById('bar1').style.height = ((S.t1/max)*90)+'px';
+    document.getElementById('bar2').style.height = ((S.t2/max)*90)+'px';
   });
 }
-
 function redoT2() { S.t2 = null; step3(); }
 
 async function goToFinal() {
-  document.getElementById("app").innerHTML = `
-  <div class="card"><div class="loading-wrap">
-    <div class="spinner"></div>
-    <div class="loading-text">Checking with coach…</div>
-  </div></div>`;
-
+  document.getElementById("app").innerHTML = `<div class="card"><div class="loading-wrap"><div class="spinner"></div><div class="loading-text">Checking with coach…</div></div></div>`;
   const fOpen = await checkUnlock('final');
   if (fOpen) { step4(); }
-  else {
-    showWaiting('Final Result', 4);
-    waitForUnlock('final', step4);
-  }
+  else { showWaiting('Final Result', 4); waitForUnlock('final', step4); }
 }
 
-// =============================================
-// STEP 4 — Habit + Final Result
-// =============================================
+// STEP 4 — Final
 function step4() {
-  stopPolling();
-  setProgress(4);
+  stopPolling(); setProgress(4);
   document.getElementById("app").innerHTML = `
   <div class="card">
     <div class="card-title">Your Reading Habit</div>
@@ -520,47 +358,24 @@ async function save4() {
   S.mins = +document.getElementById('mins').value;
   if (!S.days || !S.mins) return;
 
-  document.getElementById("app").innerHTML = `
-  <div class="card"><div class="loading-wrap">
-    <div class="spinner"></div>
-    <div class="loading-text">Calculating your reading plan…</div>
-  </div></div>`;
+  document.getElementById("app").innerHTML = `<div class="card"><div class="loading-wrap"><div class="spinner"></div><div class="loading-text">Calculating your reading plan…</div></div></div>`;
 
   setTimeout(async () => {
-    let oldTime = bookTime(S.t1, S.pages);
-    let newTime = bookTime(S.t2, S.pages);
-    let oldSessions = oldTime / S.mins;
-    let oldWeeks = oldSessions / S.days;
-    let oldDays = Math.ceil(oldWeeks * 7);
-    let newSessions = newTime / S.mins;
-    let newWeeks = newSessions / S.days;
-    let newDays = Math.ceil(newWeeks * 7);
-    let perDay = Math.round(newTime / 7);
+    let oldTime=bookTime(S.t1,S.pages), newTime=bookTime(S.t2,S.pages);
+    let oldDays=Math.ceil((oldTime/S.mins/S.days)*7);
+    let newDays=Math.ceil((newTime/S.mins/S.days)*7);
+    let perDay=Math.round(newTime/7);
 
-    // Send final result to Google Sheet
-    await sendToSheet({
-      name: S.name, days: S.days, mins: S.mins,
-      oldDays: oldDays, newDays: newDays, perDay: perDay,
-      step: 'completed'
-    });
+    await sendToSheet({ action:'submit', name:S.name, step:'completed' });
 
     document.getElementById("app").innerHTML = `
     <div class="card">
       <div class="card-title">Your Transformation</div>
       <div class="compare">
-        <div class="compare-card compare-old">
-          <div class="compare-label">❌ Before</div>
-          <div class="compare-val">${oldDays}</div>
-          <div class="result-unit">days</div>
-        </div>
-        <div class="compare-card compare-new">
-          <div class="compare-label">✅ After</div>
-          <div class="compare-val">${newDays}</div>
-          <div class="result-unit">days</div>
-        </div>
+        <div class="compare-card compare-old"><div class="compare-label">❌ Before</div><div class="compare-val">${oldDays}</div><div class="result-unit">days</div></div>
+        <div class="compare-card compare-new"><div class="compare-label">✅ After</div><div class="compare-val">${newDays}</div><div class="result-unit">days</div></div>
       </div>
     </div>
-
     <div class="cta-card">
       <div class="cta-emoji">🔥</div>
       <div class="result-label">With Your New Speed of ${S.t2} WPM</div>
@@ -569,15 +384,11 @@ async function save4() {
       <p class="insight-text">By reading just <b style="color:#c9a96e;font-size:18px">${perDay} minutes/day</b></p>
       <p class="insight-text" style="margin-top:8px">Same book. Same you. <b>Just a faster reading speed.</b></p>
     </div>
-
-    <button class="btn btn-secondary" onclick="redoHabit()">↻ Edit Reading Habit</button>
-    `;
+    <button class="btn btn-secondary" onclick="redoHabit()">↻ Edit Reading Habit</button>`;
   }, 1400);
 }
-
 function redoHabit() { step4(); }
 
-// Start
 step1();
 </script>
 </body>
