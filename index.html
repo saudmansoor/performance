@@ -100,7 +100,7 @@ body{
   -webkit-tap-highlight-color:transparent;
 }
 .btn:active:not(:disabled){transform:scale(0.98)}
-.btn:disabled{opacity:0.5;cursor:not-allowed}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
 .btn-primary{
   background:var(--coral);color:#fff;
   box-shadow:0 4px 14px rgba(216,83,62,0.28);
@@ -129,13 +129,18 @@ body{
 .result-value.coral{color:var(--coral)}
 .divider{height:1px;background:var(--border);margin:4px 0}
 
-/* ----- Question cards ----- */
-.q-group{margin-top:24px}
-.q-label{
-  font-size:14px;color:var(--ink);margin-bottom:12px;font-weight:600;
-  line-height:1.4;
+/* ----- Single-question screen ----- */
+.q-progress{
+  text-align:center;font-size:11px;font-weight:600;
+  color:var(--coral);letter-spacing:1.5px;text-transform:uppercase;
+  margin-bottom:10px;
 }
-.q-options{display:flex;flex-direction:column;gap:10px}
+.q-title{
+  font-family:'Fraunces',serif;font-weight:600;font-size:22px;
+  text-align:center;margin-bottom:22px;line-height:1.3;color:var(--ink);
+  letter-spacing:-0.2px;
+}
+.q-options{display:flex;flex-direction:column;gap:10px;margin-bottom:8px}
 .q-option{
   position:relative;display:flex;align-items:center;gap:14px;
   padding:14px 16px;background:var(--surface-2);
@@ -146,7 +151,7 @@ body{
 .q-option:hover{border-color:var(--border-strong)}
 .q-option:active{transform:scale(0.99)}
 .q-option .q-icon{
-  font-size:24px;line-height:1;flex-shrink:0;width:38px;height:38px;
+  font-size:22px;line-height:1;flex-shrink:0;width:40px;height:40px;
   display:flex;align-items:center;justify-content:center;
   background:var(--surface);border-radius:10px;
   border:1px solid var(--border);
@@ -160,7 +165,7 @@ body{
   border:1.5px solid var(--border-strong);
   flex-shrink:0;display:flex;align-items:center;justify-content:center;
   color:#fff;font-size:12px;font-weight:700;
-  transition:background .2s,border-color .2s,transform .2s;
+  transition:background .2s,border-color .2s;
 }
 .q-option.selected{
   background:var(--coral-tint);
@@ -266,6 +271,48 @@ let pollTimer = null;
 let pendingStep = null;
 let pendingCallback = null;
 
+// =============================================
+// QUESTION DEFINITIONS
+// =============================================
+const QUESTIONS = {
+  t1q1: {
+    title: 'Reading books usually feels…',
+    options: [
+      {v:'drain',  icon:'\u{1F629}', label:'Mentally draining'},
+      {v:'slow',   icon:'\u{1F40C}', label:'Slow and time-consuming'},
+      {v:'bore',   icon:'\u{1F634}', label:'Boring after a few pages'},
+      {v:'smooth', icon:'\u{2728}',  label:'Smooth and enjoyable'}
+    ]
+  },
+  t1q2: {
+    title: 'When reading, I usually…',
+    options: [
+      {v:'slow',    icon:'\u{1F422}', label:'Read slowly to understand'},
+      {v:'reread',  icon:'\u{1F501}', label:'Reread the same lines'},
+      {v:'focus',   icon:'\u{1F300}', label:'Lose focus quickly'},
+      {v:'natural', icon:'\u{1F4A1}', label:'Understand naturally and easily'}
+    ]
+  },
+  t2q1: {
+    title: 'This reading experience felt…',
+    options: [
+      {v:'lighter',  icon:'\u{1F4A8}', label:'Lighter and easier'},
+      {v:'faster',   icon:'\u{26A1}',  label:'Faster and smoother'},
+      {v:'engaging', icon:'\u{1F3AF}', label:'More engaging than usual'},
+      {v:'focused',  icon:'\u{1F9E0}', label:'Easier to stay focused on'}
+    ]
+  },
+  t2q2: {
+    title: 'Compared to before, understanding now feels…',
+    options: [
+      {v:'natural', icon:'\u{1F33F}', label:'More natural'},
+      {v:'easier',  icon:'\u{1F4AB}', label:'Easier without slowing down'},
+      {v:'clearer', icon:'\u{1F48E}', label:'Clearer and faster'},
+      {v:'less',    icon:'\u{1F60C}', label:'Less mentally exhausting'}
+    ]
+  }
+};
+
 // ---------- helpers ----------
 function esc(s){return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function bookTime(wpm, pages){return wpm > 0 ? (pages * WPP) / wpm : 0}
@@ -285,6 +332,12 @@ function setProgress(step){
 }
 function focusFirst(){
   setTimeout(()=>{const el = document.querySelector('.input-field'); if (el) el.focus();}, 60);
+}
+function labelFor(key, value){
+  const q = QUESTIONS[key];
+  if (!q) return value;
+  const m = q.options.find(o => o.v === value);
+  return m ? m.label : value;
 }
 
 // ---------- api ----------
@@ -338,7 +391,44 @@ function showWaiting(stepNum, title, sub){
     </div>`;
 }
 
-// ---------- SCREEN 1: Book Setup ----------
+// ---------- single-question screen ----------
+function renderQuestion(key, qNum, qTotal, nextLabel, onNext){
+  const q = QUESTIONS[key];
+  document.getElementById('app').innerHTML = `
+    <div class="card">
+      <div class="q-progress">Question ${qNum} of ${qTotal}</div>
+      <div class="q-title">${esc(q.title)}</div>
+      <div class="q-options" data-q="${key}">
+        ${q.options.map(o => `
+          <label class="q-option" data-v="${o.v}">
+            <span class="q-icon">${o.icon}</span>
+            <span class="q-text">${esc(o.label)}</span>
+            <span class="q-check"></span>
+          </label>`).join('')}
+      </div>
+      <button id="qbtn" class="btn btn-primary" disabled>${esc(nextLabel)}</button>
+    </div>`;
+  let selected = null;
+  const group = document.querySelector('.q-options');
+  const btn = document.getElementById('qbtn');
+  group.addEventListener('click', e => {
+    const opt = e.target.closest('.q-option');
+    if (!opt) return;
+    group.querySelectorAll('.q-option').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+    selected = opt.dataset.v;
+    btn.disabled = false;
+  });
+  btn.addEventListener('click', () => {
+    if (!selected) return;
+    btn.disabled = true;
+    onNext(selected);
+  });
+}
+
+// ============================================================
+// SCREEN 1: Book Setup
+// ============================================================
 function step1(){
   setProgress(1);
   document.getElementById('app').innerHTML = `
@@ -388,7 +478,9 @@ async function save1(){
   }
 }
 
-// ---------- SCREEN 2: Test 1 ----------
+// ============================================================
+// SCREEN 2: Test 1 — inputs → Q1 → Q2 → results
+// ============================================================
 function step2(){
   stopPolling();
   setProgress(2);
@@ -407,24 +499,48 @@ function step2(){
         </div>
       </div>
       <div class="error-msg" id="err2"></div>
-      <button id="btn2" class="btn btn-primary" onclick="save2()">See My Results</button>
+      <button id="btn2" class="btn btn-primary" onclick="save2()">Next &rarr;</button>
     </div>`;
   focusFirst();
 }
 
-async function save2(){
+function save2(){
   const l = +document.getElementById('i-l1').value;
   const w = +document.getElementById('i-w1').value;
   const err = document.getElementById('err2');
   if (!l || !w){err.textContent = 'Enter both lines and words per line.'; return}
   err.textContent = '';
   S.t1 = l * w;
+  step2_q1();
+}
 
-  const btn = document.getElementById('btn2');
-  btn.disabled = true;
-  btn.textContent = 'Calculating...';
+function step2_q1(){
+  setProgress(2);
+  renderQuestion('t1q1', 1, 2, 'Next →', value => {
+    S.t1q1 = value;
+    step2_q2();
+  });
+}
 
-  await sendToSheet({action:'submit', name:S.name, t1:S.t1, step:'t1_done'});
+function step2_q2(){
+  setProgress(2);
+  renderQuestion('t1q2', 2, 2, 'See My Results →', value => {
+    S.t1q2 = value;
+    showT1Results();
+  });
+}
+
+async function showT1Results(){
+  await sendToSheet({
+    action:'submit',
+    name:S.name,
+    t1:S.t1,
+    t1q1:S.t1q1,
+    t1q1Label:labelFor('t1q1', S.t1q1),
+    t1q2:S.t1q2,
+    t1q2Label:labelFor('t1q2', S.t1q2),
+    step:'t1_done'
+  });
 
   const hours = fmtHours(bookTime(S.t1, S.pages));
   document.getElementById('app').innerHTML = `
@@ -439,11 +555,20 @@ async function save2(){
         <div class="result-value coral">${hours}<span class="unit">hours</span></div>
       </div>
       <button class="btn btn-primary" onclick="goToScreen3()">Continue</button>
-      <button class="btn btn-ghost" onclick="step2()">Redo Test 1</button>
+      <button class="btn btn-ghost" onclick="redoT1()">Redo Test 1</button>
     </div>`;
 }
 
-// ---------- SCREEN 3: Connection exercise waiting ----------
+function redoT1(){
+  S.t1 = null;
+  S.t1q1 = null;
+  S.t1q2 = null;
+  step2();
+}
+
+// ============================================================
+// SCREEN 3: Waiting for connection exercise / T2 unlock
+// ============================================================
 async function goToScreen3(){
   showWaiting(3, 'Connection exercise in progress...', 'Stay with your coach. Test 2 unlocks shortly.');
   const open = await checkUnlock('t2');
@@ -451,34 +576,9 @@ async function goToScreen3(){
   else waitForUnlock('t2', step4);
 }
 
-// ---------- Question option configs ----------
-const CONN_OPTIONS = [
-  {v:'yes',  icon:'\u{1F525}', label:'Yes &mdash; completely different'},
-  {v:'some', icon:'\u{1F642}', label:'Somewhat better'},
-  {v:'same', icon:'\u{1F610}', label:'Same as before'}
-];
-const UND_OPTIONS = [
-  {v:'yes',  icon:'✅',    label:'Yes &mdash; much clearer'},
-  {v:'some', icon:'\u{1F642}', label:'A little better'},
-  {v:'same', icon:'\u{1F610}', label:'About the same'}
-];
-
-function renderOptions(group, opts){
-  return `<div class="q-options" data-q="${group}">` + opts.map(o => `
-    <label class="q-option" data-v="${o.v}">
-      <span class="q-icon">${o.icon}</span>
-      <span class="q-text">${o.label}</span>
-      <span class="q-check"></span>
-    </label>`).join('') + `</div>`;
-}
-
-function labelFor(group, v){
-  const opts = group === 'conn' ? CONN_OPTIONS : UND_OPTIONS;
-  const m = opts.find(o => o.v === v);
-  return m ? m.label.replace(/&mdash;/g, '—') : v;
-}
-
-// ---------- SCREEN 4: Test 2 + questions ----------
+// ============================================================
+// SCREEN 4: Test 2 — inputs → Q1 → Q2 → results
+// ============================================================
 function step4(){
   stopPolling();
   setProgress(3);
@@ -496,63 +596,51 @@ function step4(){
           <input id="i-w2" class="input-field" type="number" inputmode="numeric" placeholder="e.g. 10">
         </div>
       </div>
-      <div class="q-group">
-        <div class="q-label">Do you feel more connected to this book now?</div>
-        ${renderOptions('conn', CONN_OPTIONS)}
-      </div>
-      <div class="q-group">
-        <div class="q-label">Is your understanding better than before?</div>
-        ${renderOptions('und', UND_OPTIONS)}
-      </div>
       <div class="error-msg" id="err4"></div>
-      <button id="btn4" class="btn btn-primary" onclick="save4()">Reveal My Results</button>
+      <button id="btn4" class="btn btn-primary" onclick="save4()">Next &rarr;</button>
     </div>`;
   focusFirst();
-  document.querySelectorAll('.q-options').forEach(group => {
-    group.addEventListener('click', e => {
-      const opt = e.target.closest('.q-option');
-      if (!opt) return;
-      group.querySelectorAll('.q-option').forEach(o => o.classList.remove('selected'));
-      opt.classList.add('selected');
-    });
-  });
 }
 
-async function save4(){
+function save4(){
   const l = +document.getElementById('i-l2').value;
   const w = +document.getElementById('i-w2').value;
-  const conn = document.querySelector('.q-options[data-q="conn"] .q-option.selected');
-  const und = document.querySelector('.q-options[data-q="und"] .q-option.selected');
   const err = document.getElementById('err4');
   if (!l || !w){err.textContent = 'Enter both lines and words per line.'; return}
-  if (!conn || !und){err.textContent = 'Please answer both questions.'; return}
   err.textContent = '';
   S.t2 = l * w;
-  S.conn = conn.dataset.v;
-  S.und = und.dataset.v;
-  S.connLabel = labelFor('conn', S.conn);
-  S.undLabel = labelFor('und', S.und);
-
-  const btn = document.getElementById('btn4');
-  btn.disabled = true;
-  btn.textContent = 'Submitting...';
-
-  await sendToSheet({
-    action:'submit',
-    name:S.name,
-    t2:S.t2,
-    conn:S.conn,
-    und:S.und,
-    connLabel:S.connLabel,
-    undLabel:S.undLabel,
-    step:'t2_done'
-  });
-
-  // Results reveal immediately after Test 2 — no coach gate
-  step5();
+  step4_q1();
 }
 
-// ---------- SCREEN 5: Animated reveal ----------
+function step4_q1(){
+  setProgress(3);
+  renderQuestion('t2q1', 1, 2, 'Next →', value => {
+    S.t2q1 = value;
+    step4_q2();
+  });
+}
+
+function step4_q2(){
+  setProgress(3);
+  renderQuestion('t2q2', 2, 2, 'Reveal My Results →', async value => {
+    S.t2q2 = value;
+    await sendToSheet({
+      action:'submit',
+      name:S.name,
+      t2:S.t2,
+      t2q1:S.t2q1,
+      t2q1Label:labelFor('t2q1', S.t2q1),
+      t2q2:S.t2q2,
+      t2q2Label:labelFor('t2q2', S.t2q2),
+      step:'t2_done'
+    });
+    step5();
+  });
+}
+
+// ============================================================
+// SCREEN 5: Animated reveal — results auto-release
+// ============================================================
 function step5(){
   stopPolling();
   setProgress(4);
@@ -563,8 +651,10 @@ function step5(){
   const savedStr = fmtSaved(saved);
   const unitLabel = (savedStr === '1' || savedStr === '1.0') ? 'hour' : 'hours';
 
-  const connImproved = S.conn === 'yes' || S.conn === 'some';
-  const undImproved = S.und === 'yes' || S.und === 'some';
+  // All T2 question options are positive, so Connection and Understanding
+  // always show "Improved" when the participant has answered.
+  const connImproved = !!S.t2q1;
+  const undImproved = !!S.t2q2;
   const speedImproved = S.t1 > 0 && S.t2 > S.t1;
 
   const statusHtml = (improved) => improved
