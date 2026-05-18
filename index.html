@@ -1,393 +1,623 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reading Speed Tool</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet">
+<title>Book Connection Scan</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  font-family:'DM Sans',sans-serif;background:#faf7f2;
-  min-height:100vh;color:#2d2418;
-  padding-bottom:env(safe-area-inset-bottom,20px);
+:root{
+  --bg:#faf6ee;
+  --surface:#ffffff;
+  --surface-2:#fbf6ea;
+  --coral:#d8533e;
+  --coral-soft:#e3735f;
+  --coral-tint:rgba(216,83,62,0.08);
+  --gold:#c9a96e;
+  --gold-tint:rgba(201,169,110,0.12);
+  --green:#3a8f5c;
+  --green-tint:rgba(58,143,92,0.12);
+  --ink:#2d2418;
+  --ink-soft:#5c5040;
+  --muted:#8a7e6b;
+  --faint:#bfb3a1;
+  --border:rgba(45,36,24,0.08);
+  --border-strong:rgba(45,36,24,0.16);
+  --error:#c44535;
 }
-.container{max-width:440px;margin:0 auto;padding:24px 20px 80px}
-.header{text-align:center;padding:20px 0 8px}
-.header-icon{font-size:36px;margin-bottom:8px}
-.header h1{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:#2d2418;letter-spacing:-0.3px}
-.header p{font-size:13px;color:#8a7e6b;margin-top:4px}
-.progress-wrap{display:flex;gap:6px;margin:20px 0 24px}
-.progress-dot{flex:1;height:4px;border-radius:4px;background:#e4ddd2;transition:background 0.4s,transform 0.3s}
-.progress-dot.active{background:#e8604c;transform:scaleY(1.2)}
-.progress-dot.done{background:#c9a96e}
-.card{background:#fff;border-radius:16px;padding:28px 24px 32px;box-shadow:0 1px 3px rgba(45,36,24,0.04),0 8px 24px rgba(45,36,24,0.06);animation:slideUp 0.45s cubic-bezier(.22,.68,0,.98);margin-bottom:20px}
-@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.card-title{font-family:'Fraunces',serif;font-size:18px;font-weight:700;text-align:center;margin-bottom:6px;color:#2d2418}
-.card-sub{text-align:center;font-size:13px;color:#8a7e6b;margin-bottom:20px;line-height:1.5}
-.input-group{margin-bottom:14px}
-.input-label{font-size:12px;font-weight:600;color:#8a7e6b;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;display:block}
-.input-field{width:100%;padding:14px 16px;font-size:16px;font-family:'DM Sans',sans-serif;border:1.5px solid #e4ddd2;border-radius:12px;background:#faf7f2;color:#2d2418;transition:border-color 0.2s,box-shadow 0.2s;outline:none;-webkit-appearance:none}
-.input-field:focus{border-color:#c9a96e;box-shadow:0 0 0 3px rgba(201,169,110,0.15);background:#fff}
-.input-field::placeholder{color:#bfb5a3}
-.btn{width:100%;padding:15px;margin-top:8px;margin-bottom:4px;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:600;border:none;border-radius:12px;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s,background 0.2s;-webkit-tap-highlight-color:transparent}
-.btn:active{transform:scale(0.97)}
-.btn-primary{background:#e8604c;color:#fff;box-shadow:0 4px 12px rgba(232,96,76,0.3)}
-.btn-primary:hover{background:#d9523e;box-shadow:0 6px 16px rgba(232,96,76,0.35)}
-.btn-secondary{background:transparent;color:#8a7e6b;font-weight:500;font-size:13px;margin-top:4px;padding:10px}
-.btn-secondary:hover{background:#f0ebe3}
-.result-block{text-align:center;padding:8px 0}
-.result-label{font-size:12px;font-weight:600;color:#8a7e6b;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px}
-.result-value{font-family:'Fraunces',serif;font-size:32px;font-weight:800;color:#2d2418;line-height:1.2}
-.result-value.accent{color:#e8604c}
-.result-value.green{color:#3a8f5c}
-.result-unit{font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:#8a7e6b}
-.divider{height:1px;background:#e4ddd2;margin:16px 0}
-.insight-text{font-size:14px;line-height:1.6;color:#5c5040;text-align:center;padding:4px 0}
-.insight-text b{color:#2d2418}
-.chart-wrap{display:flex;align-items:flex-end;justify-content:center;gap:32px;height:140px;margin-top:20px}
-.bar-group{display:flex;flex-direction:column;align-items:center;gap:8px}
-.bar{width:48px;border-radius:8px 8px 4px 4px;transition:height 0.6s cubic-bezier(.22,.68,0,.98)}
-.bar-t1{background:#e4ddd2}
-.bar-t2{background:#3a8f5c}
-.bar-label{font-size:12px;font-weight:600;color:#8a7e6b}
-.bar-val{font-family:'Fraunces',serif;font-size:14px;font-weight:700;color:#2d2418}
-.compare{display:flex;gap:10px;margin:12px 0 4px}
-.compare-card{flex:1;padding:14px;border-radius:12px;text-align:center}
-.compare-old{background:#f5f0e8;border:1.5px solid #e4ddd2}
-.compare-new{background:#eef7f0;border:1.5px solid #b8dfc4}
-.compare-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px}
-.compare-old .compare-label{color:#8a7e6b}
-.compare-new .compare-label{color:#3a8f5c}
-.compare-val{font-family:'Fraunces',serif;font-size:22px;font-weight:700}
-.compare-old .compare-val{color:#5c5040;text-decoration:line-through;text-decoration-color:#c9a96e}
-.compare-new .compare-val{color:#3a8f5c}
-.cta-card{background:linear-gradient(135deg,#2d2418,#4a3c2a);border-radius:16px;padding:28px 24px;text-align:center;margin-top:16px;box-shadow:0 8px 24px rgba(45,36,24,0.2);animation:slideUp 0.45s cubic-bezier(.22,.68,0,.98)}
-.cta-card .result-label{color:#c9a96e}
-.cta-card .result-value{color:#fff}
-.cta-card .insight-text{color:#d4c9b8}
-.cta-card .insight-text b{color:#fff}
-.cta-emoji{font-size:36px;margin-bottom:12px}
-.loading-wrap{text-align:center;padding:40px 20px}
-.spinner{width:32px;height:32px;border:3px solid #e4ddd2;border-top-color:#e8604c;border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 16px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{font-size:14px;color:#8a7e6b}
-.input-row{display:flex;gap:10px}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);min-height:100vh}
+body{
+  font-family:'DM Sans',sans-serif;
+  font-size:15px;line-height:1.5;
+  padding-bottom:env(safe-area-inset-bottom,24px);
+  -webkit-font-smoothing:antialiased;
+}
+.container{max-width:440px;margin:0 auto;padding:28px 22px 80px}
+.brand{
+  text-align:center;
+  font-family:'Fraunces',serif;font-style:italic;font-weight:500;
+  font-size:11px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--coral);margin-bottom:22px;
+}
+.brand .dot{display:inline-block;width:3px;height:3px;background:var(--coral);border-radius:50%;margin:0 10px;vertical-align:3px}
+.progress-wrap{display:flex;gap:6px;margin:0 0 26px}
+.progress-dot{flex:1;height:3px;border-radius:3px;background:rgba(45,36,24,0.08);transition:background .4s,height .3s}
+.progress-dot.active{background:var(--coral);height:4px}
+.progress-dot.done{background:var(--gold)}
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:30px 26px;
+  margin-bottom:16px;
+  box-shadow:0 1px 3px rgba(45,36,24,0.03),0 12px 32px rgba(45,36,24,0.05);
+  animation:fadeIn .5s ease-out;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card-heading{
+  font-family:'Fraunces',serif;font-weight:600;font-size:24px;
+  letter-spacing:-0.3px;text-align:center;margin-bottom:8px;line-height:1.25;
+  color:var(--ink);
+}
+.card-sub{
+  text-align:center;font-size:14px;color:var(--muted);
+  line-height:1.5;margin-bottom:24px;
+}
+.instruction{
+  text-align:center;font-size:14px;color:var(--ink-soft);
+  line-height:1.6;padding:14px 16px;
+  background:var(--coral-tint);
+  border:1px solid rgba(216,83,62,0.18);
+  border-radius:12px;margin-bottom:22px;
+}
+.input-group{margin-bottom:16px}
+.input-label{
+  display:block;font-size:11px;font-weight:600;color:var(--muted);
+  letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px;
+}
+.input-field{
+  width:100%;padding:14px 16px;font-size:16px;
+  font-family:'DM Sans',sans-serif;
+  background:var(--surface-2);color:var(--ink);
+  border:1.5px solid var(--border);border-radius:12px;outline:none;
+  transition:border-color .2s,background .2s,box-shadow .2s;
+  -webkit-appearance:none;
+}
+.input-field::placeholder{color:var(--faint)}
+.input-field:focus{
+  border-color:var(--coral);background:var(--surface);
+  box-shadow:0 0 0 3px rgba(216,83,62,0.12);
+}
+.input-row{display:flex;gap:12px}
 .input-row .input-group{flex:1}
-.waiting-card{text-align:center;padding:40px 20px}
-.waiting-icon{font-size:40px;margin-bottom:12px}
-.waiting-title{font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-bottom:6px}
-.waiting-sub{font-size:13px;color:#8a7e6b;line-height:1.5}
-.pulse{animation:pulse 2s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-.status-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:6px 12px;border-radius:20px;margin-bottom:16px}
-.status-online{background:#eef7f0;color:#3a8f5c}
-.status-dot{width:6px;height:6px;border-radius:50%;background:#3a8f5c;animation:pulse 2s infinite}
+.btn{
+  width:100%;padding:16px;margin-top:14px;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;
+  letter-spacing:1.2px;text-transform:uppercase;
+  border:none;border-radius:12px;cursor:pointer;
+  transition:transform .15s,opacity .2s,background .2s,box-shadow .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn:active:not(:disabled){transform:scale(0.98)}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+.btn-primary{
+  background:var(--coral);color:#fff;
+  box-shadow:0 4px 14px rgba(216,83,62,0.28);
+}
+.btn-primary:hover:not(:disabled){background:#c44535;box-shadow:0 6px 18px rgba(216,83,62,0.36)}
+.btn-ghost{
+  background:transparent;color:var(--muted);font-weight:500;
+  text-transform:none;letter-spacing:0;font-size:13px;
+  padding:10px;margin-top:4px;
+}
+.btn-ghost:hover:not(:disabled){color:var(--coral)}
+.error-msg{font-size:12px;color:var(--error);margin-top:8px;text-align:center;min-height:16px;font-weight:500}
+.result-row{text-align:center;padding:18px 0}
+.result-label{
+  font-size:11px;font-weight:600;color:var(--muted);
+  letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;
+}
+.result-value{
+  font-family:'Fraunces',serif;font-weight:600;font-size:40px;
+  letter-spacing:-0.5px;color:var(--ink);
+}
+.result-value .unit{
+  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;
+  color:var(--muted);letter-spacing:0;margin-left:6px;
+}
+.result-value.coral{color:var(--coral)}
+.divider{height:1px;background:var(--border);margin:4px 0}
+
+/* ----- Question cards ----- */
+.q-group{margin-top:24px}
+.q-label{
+  font-size:14px;color:var(--ink);margin-bottom:12px;font-weight:600;
+  line-height:1.4;
+}
+.q-options{display:flex;flex-direction:column;gap:10px}
+.q-option{
+  position:relative;display:flex;align-items:center;gap:14px;
+  padding:14px 16px;background:var(--surface-2);
+  border:1.5px solid var(--border);border-radius:14px;cursor:pointer;
+  transition:border-color .2s,background .2s,transform .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.q-option:hover{border-color:var(--border-strong)}
+.q-option:active{transform:scale(0.99)}
+.q-option .q-icon{
+  font-size:24px;line-height:1;flex-shrink:0;width:38px;height:38px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--surface);border-radius:10px;
+  border:1px solid var(--border);
+  transition:background .2s,border-color .2s,transform .2s;
+}
+.q-option .q-text{
+  flex:1;font-size:14.5px;color:var(--ink);font-weight:500;line-height:1.35;
+}
+.q-option .q-check{
+  width:22px;height:22px;border-radius:50%;
+  border:1.5px solid var(--border-strong);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:12px;font-weight:700;
+  transition:background .2s,border-color .2s,transform .2s;
+}
+.q-option.selected{
+  background:var(--coral-tint);
+  border-color:var(--coral);
+}
+.q-option.selected .q-icon{
+  background:#fff;border-color:var(--coral);transform:scale(1.08);
+}
+.q-option.selected .q-check{
+  background:var(--coral);border-color:var(--coral);
+}
+.q-option.selected .q-check::after{content:'\2713'}
+.q-option.selected .q-text{color:var(--ink);font-weight:600}
+
+/* ----- Waiting screen ----- */
+.waiting{text-align:center;padding:54px 20px}
+.waiting-dots{display:inline-flex;gap:10px;margin-bottom:24px}
+.waiting-dots span{
+  width:10px;height:10px;background:var(--coral);border-radius:50%;
+  animation:bounce 1.4s ease-in-out infinite;
+}
+.waiting-dots span:nth-child(2){animation-delay:.2s;background:var(--gold)}
+.waiting-dots span:nth-child(3){animation-delay:.4s;background:var(--coral)}
+@keyframes bounce{
+  0%,80%,100%{transform:scale(0.5);opacity:0.4}
+  40%{transform:scale(1);opacity:1}
+}
+.waiting-text{font-family:'Fraunces',serif;font-weight:600;font-size:20px;color:var(--ink);letter-spacing:-0.2px}
+.waiting-sub{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.5}
+
+/* ----- Reveal animation ----- */
+.reveal-stack{padding:4px 0}
+.tick{
+  display:flex;align-items:center;gap:14px;padding:18px 4px;
+  border-bottom:1px solid var(--border);
+  opacity:0;transform:translateY(8px);
+}
+.tick:last-of-type{border-bottom:none}
+.tick.show{animation:tickIn .55s cubic-bezier(.22,.68,0,.98) forwards}
+@keyframes tickIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.tick-icon{
+  width:44px;height:44px;border-radius:50%;
+  background:var(--coral-tint);border:1px solid rgba(216,83,62,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.tick-body{flex:1;min-width:0}
+.tick-title{font-size:14.5px;font-weight:600;color:var(--ink)}
+.tick-detail{font-size:12px;color:var(--muted);margin-top:3px}
+.tick-detail .strike{text-decoration:line-through;text-decoration-color:var(--faint);margin-right:4px}
+.tick-detail .arrow{color:var(--coral);margin:0 6px;font-weight:600}
+.tick-status{font-size:13px;font-weight:600;flex-shrink:0;display:flex;align-items:center;gap:7px}
+.tick-status.improved{color:var(--green)}
+.tick-status.same{color:var(--muted)}
+.tick-status .check{
+  display:inline-flex;width:20px;height:20px;border-radius:50%;
+  background:var(--green);color:#fff;
+  align-items:center;justify-content:center;font-size:11px;font-weight:700;
+}
+.tick-status.same .check{background:var(--faint);color:#fff}
+
+.reveal-finale{text-align:center;margin-top:32px;opacity:0;transform:translateY(8px)}
+.reveal-finale.show{animation:tickIn .7s cubic-bezier(.22,.68,0,.98) forwards}
+.reveal-finale .star{font-size:24px;display:block;margin-bottom:12px}
+.reveal-finale .saved{
+  font-family:'Fraunces',serif;font-weight:700;
+  font-size:46px;letter-spacing:-1px;color:var(--coral);line-height:1.1;
+}
+.reveal-finale .saved .unit{
+  font-family:'DM Sans',sans-serif;font-size:18px;font-weight:500;
+  color:var(--coral-soft);letter-spacing:0;margin-left:6px;
+}
+.reveal-sub{text-align:center;margin-top:20px;font-size:14px;color:var(--ink-soft);line-height:1.6;opacity:0}
+.reveal-sub.show{animation:tickIn .6s ease-out forwards}
+.reveal-closer{
+  text-align:center;margin-top:22px;
+  font-family:'Fraunces',serif;font-style:italic;font-weight:500;
+  font-size:15px;color:var(--coral);line-height:1.5;opacity:0;padding:0 8px;
+}
+.reveal-closer.show{animation:tickIn .6s ease-out forwards}
 </style>
 </head>
 <body>
 <div class="container">
-<div class="header">
-  <div class="header-icon">📖</div>
-  <h1>Reading Speed Tool</h1>
-  <p>Discover how fast you can finish any book</p>
-</div>
-<div class="progress-wrap">
-  <div class="progress-dot" id="p1"></div>
-  <div class="progress-dot" id="p2"></div>
-  <div class="progress-dot" id="p3"></div>
-  <div class="progress-dot" id="p4"></div>
-</div>
-<div id="app"></div>
+  <div class="brand">Book<span class="dot"></span>Connection<span class="dot"></span>Scan</div>
+  <div class="progress-wrap">
+    <div class="progress-dot" id="p1"></div>
+    <div class="progress-dot" id="p2"></div>
+    <div class="progress-dot" id="p3"></div>
+    <div class="progress-dot" id="p4"></div>
+  </div>
+  <div id="app"></div>
 </div>
 <script>
 // =============================================
-// ⚙️  PASTE YOUR APPS SCRIPT WEB APP URL HERE
+// API URL — replace with your Apps Script deployment
 // =============================================
 const API_URL = "https://script.google.com/macros/s/AKfycbz96U-TMvD4G7WWwr0g5xqkaDQyvu8kdo96ZTXcw6CQo23uQ4QxcLAgmdkxhVMTH2ngsQ/exec";
-// =============================================
 
-let S = {};
 const WPP = 250;
+const S = {};
 let pollTimer = null;
+let pendingStep = null;
+let pendingCallback = null;
 
-function bookTime(wpm, pages) { return (pages * WPP) / wpm; }
-function fmtHours(mins) { return (mins / 60).toFixed(1); }
-function setProgress(step) {
-  for (let i = 1; i <= 4; i++) {
-    let d = document.getElementById('p' + i);
+// ---------- helpers ----------
+function esc(s){return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function bookTime(wpm, pages){return wpm > 0 ? (pages * WPP) / wpm : 0}
+function fmtHours(mins){return (mins/60).toFixed(1)}
+function fmtSaved(mins){
+  const h = mins/60;
+  return h >= 10 ? String(Math.round(h)) : h.toFixed(1);
+}
+function setProgress(step){
+  for (let i = 1; i <= 4; i++){
+    const d = document.getElementById('p'+i);
+    if (!d) continue;
     d.className = 'progress-dot';
     if (i < step) d.classList.add('done');
     if (i === step) d.classList.add('active');
   }
 }
+function focusFirst(){
+  setTimeout(()=>{const el = document.querySelector('.input-field'); if (el) el.focus();}, 60);
+}
 
-// =============================================
-// 📡 API — All GET requests (no CORS issues)
-// =============================================
-function apiCall(params) {
+// ---------- api ----------
+function apiCall(params){
   const url = API_URL + '?' + new URLSearchParams(params).toString();
-  return fetch(url).then(r => r.json()).catch(e => {
-    console.log('API error:', e);
-    return null;
-  });
+  return fetch(url).then(r => r.json()).catch(e => {console.error('API error', e); return null});
+}
+async function sendToSheet(data){await apiCall(data)}
+async function checkUnlock(step){
+  const d = await apiCall({action:'status'});
+  return !!(d && d[step] === true);
 }
 
-async function sendToSheet(data) {
-  await apiCall(data);
+// ---------- polling, paused when tab hidden ----------
+function stopPolling(){
+  if (pollTimer){clearInterval(pollTimer); pollTimer = null}
+  pendingStep = null;
+  pendingCallback = null;
 }
-
-async function checkUnlock(step) {
-  const d = await apiCall({ action: 'status' });
-  if (d && d[step] !== undefined) {
-    return d[step] === true;
-  }
-  return false;
-}
-
-function stopPolling() {
-  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
-}
-
-function waitForUnlock(step, callback) {
-  stopPolling();
+function startPoll(){
+  if (pollTimer || !pendingStep) return;
   pollTimer = setInterval(async () => {
-    const unlocked = await checkUnlock(step);
-    if (unlocked) { stopPolling(); callback(); }
-  }, 3000);
+    if (document.hidden) return;
+    const ok = await checkUnlock(pendingStep);
+    if (ok){
+      const cb = pendingCallback;
+      stopPolling();
+      if (cb) cb();
+    }
+  }, 3500);
 }
+function waitForUnlock(step, callback){
+  stopPolling();
+  pendingStep = step;
+  pendingCallback = callback;
+  startPoll();
+}
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && pendingStep && !pollTimer) startPoll();
+});
 
-function showWaiting(stepName, stepNum) {
+function showWaiting(stepNum, title, sub){
   setProgress(stepNum);
-  document.getElementById("app").innerHTML = `
-  <div class="card">
-    <div class="waiting-card">
-      <div class="waiting-icon pulse">⏳</div>
-      <div class="waiting-title">Waiting for Coach</div>
-      <div class="waiting-sub">Your coach will unlock <b>${stepName}</b> shortly.<br>Please keep this page open.</div>
-    </div>
-  </div>`;
+  document.getElementById('app').innerHTML = `
+    <div class="card">
+      <div class="waiting">
+        <div class="waiting-dots"><span></span><span></span><span></span></div>
+        <div class="waiting-text">${esc(title)}</div>
+        <div class="waiting-sub">${esc(sub)}</div>
+      </div>
+    </div>`;
 }
 
-// STEP 1
-function step1() {
+// ---------- SCREEN 1: Book Setup ----------
+function step1(){
   setProgress(1);
-  document.getElementById("app").innerHTML = `
-  <div class="card">
-    <div class="card-title">Let's get started</div>
-    <div class="card-sub">Tell us about yourself and the book you're reading</div>
-    <div class="input-group">
-      <label class="input-label">Your Name</label>
-      <input class="input-field" id="name" placeholder="e.g. Rahul">
-    </div>
-    <div class="input-group">
-      <label class="input-label">Book Name</label>
-      <input class="input-field" id="book" placeholder="e.g. Atomic Habits">
-    </div>
-    <div class="input-group">
-      <label class="input-label">Total Pages</label>
-      <input class="input-field" id="pages" type="number" inputmode="numeric" placeholder="e.g. 320">
-    </div>
-    <button class="btn btn-primary" onclick="save1()">Join Workshop →</button>
-  </div>`;
-}
-
-async function save1() {
-  S.name = document.getElementById('name').value.trim();
-  S.book = document.getElementById('book').value.trim();
-  S.pages = +document.getElementById('pages').value;
-  if (!S.name || !S.book || !S.pages) return;
-
-  document.getElementById("app").innerHTML = `
-  <div class="card"><div class="loading-wrap">
-    <div class="spinner"></div><div class="loading-text">Joining workshop…</div>
-  </div></div>`;
-
-  await sendToSheet({ action:'submit', name:S.name, book:S.book, pages:S.pages, step:'registered' });
-
-  const t1Open = await checkUnlock('t1');
-  if (t1Open) { step2(); }
-  else { showWaiting('Test 1', 2); waitForUnlock('t1', step2); }
-}
-
-// STEP 2 — Test 1
-function step2() {
-  stopPolling(); setProgress(2);
-  document.getElementById("app").innerHTML = `
-  <div class="card">
-    <div style="text-align:center"><span class="status-badge status-online"><span class="status-dot"></span> Live Workshop</span></div>
-    <div class="card-title">Test 1 — Baseline</div>
-    <div class="card-sub">Read for 1 minute at your normal speed, then enter your count</div>
-    <div class="input-row">
+  document.getElementById('app').innerHTML = `
+    <div class="card">
+      <div class="card-heading">Let's find out where you are right now</div>
+      <div class="card-sub">Tell us a bit about you and the book you're reading</div>
       <div class="input-group">
-        <label class="input-label">Lines Read</label>
-        <input class="input-field" id="l1" type="number" inputmode="numeric" placeholder="e.g. 18">
+        <label class="input-label" for="i-name">Your Name</label>
+        <input id="i-name" class="input-field" placeholder="e.g. Rahul">
       </div>
       <div class="input-group">
-        <label class="input-label">Words / Line</label>
-        <input class="input-field" id="w1" type="number" inputmode="numeric" placeholder="e.g. 10">
+        <label class="input-label" for="i-book">Book Name</label>
+        <input id="i-book" class="input-field" placeholder="e.g. Atomic Habits">
       </div>
-    </div>
-    <button class="btn btn-primary" onclick="save2()">See My Speed →</button>
-  </div>`;
+      <div class="input-group">
+        <label class="input-label" for="i-pages">Number of Pages</label>
+        <input id="i-pages" class="input-field" type="number" inputmode="numeric" placeholder="e.g. 320">
+      </div>
+      <div class="error-msg" id="err1"></div>
+      <button id="btn1" class="btn btn-primary" onclick="save1()">Begin Scan</button>
+    </div>`;
+  focusFirst();
 }
 
-async function save2() {
-  let l = +document.getElementById('l1').value;
-  let w = +document.getElementById('w1').value;
-  if (!l || !w) return;
+async function save1(){
+  const name = document.getElementById('i-name').value.trim();
+  const book = document.getElementById('i-book').value.trim();
+  const pages = +document.getElementById('i-pages').value;
+  const err = document.getElementById('err1');
+  if (!name || !book || !pages){err.textContent = 'Please fill in all three fields.'; return}
+  err.textContent = '';
+  S.name = name;
+  S.book = book;
+  S.pages = pages;
+
+  const btn = document.getElementById('btn1');
+  btn.disabled = true;
+  btn.textContent = 'Joining...';
+
+  await sendToSheet({action:'submit', name, book, pages, step:'registered'});
+
+  const open = await checkUnlock('t1');
+  if (open) step2();
+  else {
+    showWaiting(1, 'Waiting for coach', 'Your coach will start the scan in a moment.');
+    waitForUnlock('t1', step2);
+  }
+}
+
+// ---------- SCREEN 2: Test 1 ----------
+function step2(){
+  stopPolling();
+  setProgress(2);
+  document.getElementById('app').innerHTML = `
+    <div class="card">
+      <div class="card-heading">Test 1 &mdash; Baseline</div>
+      <div class="instruction">Read for exactly 60 seconds at your normal pace</div>
+      <div class="input-row">
+        <div class="input-group">
+          <label class="input-label" for="i-l1">Lines Read</label>
+          <input id="i-l1" class="input-field" type="number" inputmode="numeric" placeholder="e.g. 18">
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="i-w1">Words / Line</label>
+          <input id="i-w1" class="input-field" type="number" inputmode="numeric" placeholder="e.g. 10">
+        </div>
+      </div>
+      <div class="error-msg" id="err2"></div>
+      <button id="btn2" class="btn btn-primary" onclick="save2()">See My Results</button>
+    </div>`;
+  focusFirst();
+}
+
+async function save2(){
+  const l = +document.getElementById('i-l1').value;
+  const w = +document.getElementById('i-w1').value;
+  const err = document.getElementById('err2');
+  if (!l || !w){err.textContent = 'Enter both lines and words per line.'; return}
+  err.textContent = '';
   S.t1 = l * w;
-  let t = bookTime(S.t1, S.pages);
 
-  await sendToSheet({ action:'submit', name:S.name, t1:S.t1, step:'t1_done' });
+  const btn = document.getElementById('btn2');
+  btn.disabled = true;
+  btn.textContent = 'Calculating...';
 
-  document.getElementById("app").innerHTML = `
-  <div class="card">
-    <div class="result-block">
-      <div class="result-label">Your Current Speed</div>
-      <div class="result-value">${S.t1} <span class="result-unit">WPM</span></div>
-    </div>
-    <div class="divider"></div>
-    <div class="result-block">
-      <div class="result-label">Time to Finish "${S.book}"</div>
-      <div class="result-value accent">${fmtHours(t)} <span class="result-unit">hours</span></div>
-    </div>
-    <div class="divider"></div>
-    <p class="insight-text"><b>If nothing changes…</b> this is how long it will take you to finish this book.</p>
-    <button class="btn btn-primary" onclick="goToT2()">Let's Improve This →</button>
-    <button class="btn btn-secondary" onclick="redoT1()">↻ Redo Test 1</button>
-  </div>`;
-}
-function redoT1() { S.t1 = null; step2(); }
+  await sendToSheet({action:'submit', name:S.name, t1:S.t1, step:'t1_done'});
 
-async function goToT2() {
-  document.getElementById("app").innerHTML = `<div class="card"><div class="loading-wrap"><div class="spinner"></div><div class="loading-text">Checking with coach…</div></div></div>`;
-  const t2Open = await checkUnlock('t2');
-  if (t2Open) { step3(); }
-  else { showWaiting('Test 2', 3); waitForUnlock('t2', step3); }
+  const hours = fmtHours(bookTime(S.t1, S.pages));
+  document.getElementById('app').innerHTML = `
+    <div class="card">
+      <div class="result-row">
+        <div class="result-label">Your reading speed</div>
+        <div class="result-value">${S.t1}<span class="unit">WPM</span></div>
+      </div>
+      <div class="divider"></div>
+      <div class="result-row">
+        <div class="result-label">Time to finish this book</div>
+        <div class="result-value coral">${hours}<span class="unit">hours</span></div>
+      </div>
+      <button class="btn btn-primary" onclick="goToScreen3()">Continue</button>
+      <button class="btn btn-ghost" onclick="step2()">Redo Test 1</button>
+    </div>`;
 }
 
-// STEP 3 — Test 2
-function step3() {
-  stopPolling(); setProgress(3);
-  document.getElementById("app").innerHTML = `
-  <div class="card">
-    <div style="text-align:center"><span class="status-badge status-online"><span class="status-dot"></span> Live Workshop</span></div>
-    <div class="card-title">Test 2 — Boosted</div>
-    <div class="card-sub">This time, use your finger to guide your eyes and push yourself to read faster</div>
-    <div class="input-row">
-      <div class="input-group">
-        <label class="input-label">Lines Read</label>
-        <input class="input-field" id="l2" type="number" inputmode="numeric" placeholder="e.g. 24">
-      </div>
-      <div class="input-group">
-        <label class="input-label">Words / Line</label>
-        <input class="input-field" id="w2" type="number" inputmode="numeric" placeholder="e.g. 10">
-      </div>
-    </div>
-    <button class="btn btn-primary" onclick="save3()">See Improvement →</button>
-  </div>`;
+// ---------- SCREEN 3: Connection exercise waiting ----------
+async function goToScreen3(){
+  showWaiting(3, 'Connection exercise in progress...', 'Stay with your coach. Test 2 unlocks shortly.');
+  const open = await checkUnlock('t2');
+  if (open) step4();
+  else waitForUnlock('t2', step4);
 }
 
-async function save3() {
-  let l = +document.getElementById('l2').value;
-  let w = +document.getElementById('w2').value;
-  if (!l || !w) return;
-  S.t2 = l * w;
-  let gain = Math.round(((S.t2 - S.t1) / S.t1) * 100);
-  let seconds = Math.round(60 / (S.t2 / S.t1));
+// ---------- Question option configs ----------
+const CONN_OPTIONS = [
+  {v:'yes',  icon:'\u{1F525}', label:'Yes &mdash; completely different'},
+  {v:'some', icon:'\u{1F642}', label:'Somewhat better'},
+  {v:'same', icon:'\u{1F610}', label:'Same as before'}
+];
+const UND_OPTIONS = [
+  {v:'yes',  icon:'✅',    label:'Yes &mdash; much clearer'},
+  {v:'some', icon:'\u{1F642}', label:'A little better'},
+  {v:'same', icon:'\u{1F610}', label:'About the same'}
+];
 
-  await sendToSheet({ action:'submit', name:S.name, t2:S.t2, gain:gain, step:'t2_done' });
+function renderOptions(group, opts){
+  return `<div class="q-options" data-q="${group}">` + opts.map(o => `
+    <label class="q-option" data-v="${o.v}">
+      <span class="q-icon">${o.icon}</span>
+      <span class="q-text">${o.label}</span>
+      <span class="q-check"></span>
+    </label>`).join('') + `</div>`;
+}
 
-  document.getElementById("app").innerHTML = `
-  <div class="card">
-    <div class="result-block">
-      <div class="result-label">Speed Comparison</div>
-      <div class="chart-wrap">
-        <div class="bar-group"><div class="bar-val">${S.t1}</div><div class="bar bar-t1" id="bar1"></div><div class="bar-label">Before</div></div>
-        <div class="bar-group"><div class="bar-val">${S.t2}</div><div class="bar bar-t2" id="bar2"></div><div class="bar-label">After</div></div>
+function labelFor(group, v){
+  const opts = group === 'conn' ? CONN_OPTIONS : UND_OPTIONS;
+  const m = opts.find(o => o.v === v);
+  return m ? m.label.replace(/&mdash;/g, '—') : v;
+}
+
+// ---------- SCREEN 4: Test 2 + questions ----------
+function step4(){
+  stopPolling();
+  setProgress(3);
+  document.getElementById('app').innerHTML = `
+    <div class="card">
+      <div class="card-heading">Test 2 &mdash; After</div>
+      <div class="instruction">Now read again for exactly 60 seconds</div>
+      <div class="input-row">
+        <div class="input-group">
+          <label class="input-label" for="i-l2">Lines Read</label>
+          <input id="i-l2" class="input-field" type="number" inputmode="numeric" placeholder="e.g. 24">
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="i-w2">Words / Line</label>
+          <input id="i-w2" class="input-field" type="number" inputmode="numeric" placeholder="e.g. 10">
+        </div>
       </div>
-    </div>
-    <div class="divider"></div>
-    <div class="result-block">
-      <div class="result-value green">+${gain}%</div>
-      <div class="result-label" style="margin-top:2px">Faster in just one try</div>
-    </div>
-    <div class="divider"></div>
-    <p class="insight-text">What took you <b>60 seconds</b> before now takes only <b>${seconds} seconds</b></p>
-    <button class="btn btn-primary" onclick="goToFinal()">Almost Done →</button>
-    <button class="btn btn-secondary" onclick="redoT2()">↻ Redo Test 2</button>
-  </div>`;
-  requestAnimationFrame(() => {
-    let max = Math.max(S.t1, S.t2);
-    document.getElementById('bar1').style.height = ((S.t1/max)*90)+'px';
-    document.getElementById('bar2').style.height = ((S.t2/max)*90)+'px';
+      <div class="q-group">
+        <div class="q-label">Do you feel more connected to this book now?</div>
+        ${renderOptions('conn', CONN_OPTIONS)}
+      </div>
+      <div class="q-group">
+        <div class="q-label">Is your understanding better than before?</div>
+        ${renderOptions('und', UND_OPTIONS)}
+      </div>
+      <div class="error-msg" id="err4"></div>
+      <button id="btn4" class="btn btn-primary" onclick="save4()">Reveal My Results</button>
+    </div>`;
+  focusFirst();
+  document.querySelectorAll('.q-options').forEach(group => {
+    group.addEventListener('click', e => {
+      const opt = e.target.closest('.q-option');
+      if (!opt) return;
+      group.querySelectorAll('.q-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+    });
   });
 }
-function redoT2() { S.t2 = null; step3(); }
 
-async function goToFinal() {
-  document.getElementById("app").innerHTML = `<div class="card"><div class="loading-wrap"><div class="spinner"></div><div class="loading-text">Checking with coach…</div></div></div>`;
-  const fOpen = await checkUnlock('final');
-  if (fOpen) { step4(); }
-  else { showWaiting('Final Result', 4); waitForUnlock('final', step4); }
+async function save4(){
+  const l = +document.getElementById('i-l2').value;
+  const w = +document.getElementById('i-w2').value;
+  const conn = document.querySelector('.q-options[data-q="conn"] .q-option.selected');
+  const und = document.querySelector('.q-options[data-q="und"] .q-option.selected');
+  const err = document.getElementById('err4');
+  if (!l || !w){err.textContent = 'Enter both lines and words per line.'; return}
+  if (!conn || !und){err.textContent = 'Please answer both questions.'; return}
+  err.textContent = '';
+  S.t2 = l * w;
+  S.conn = conn.dataset.v;
+  S.und = und.dataset.v;
+  S.connLabel = labelFor('conn', S.conn);
+  S.undLabel = labelFor('und', S.und);
+
+  const btn = document.getElementById('btn4');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  await sendToSheet({
+    action:'submit',
+    name:S.name,
+    t2:S.t2,
+    conn:S.conn,
+    und:S.und,
+    connLabel:S.connLabel,
+    undLabel:S.undLabel,
+    step:'t2_done'
+  });
+
+  // Results reveal immediately after Test 2 — no coach gate
+  step5();
 }
 
-// STEP 4 — Final
-function step4() {
-  stopPolling(); setProgress(4);
-  document.getElementById("app").innerHTML = `
-  <div class="card">
-    <div class="card-title">Your Reading Habit</div>
-    <div class="card-sub">How often do you currently read?</div>
-    <div class="input-row">
-      <div class="input-group">
-        <label class="input-label">Days / Week</label>
-        <input class="input-field" id="days" type="number" inputmode="numeric" placeholder="e.g. 5">
-      </div>
-      <div class="input-group">
-        <label class="input-label">Mins / Session</label>
-        <input class="input-field" id="mins" type="number" inputmode="numeric" placeholder="e.g. 30">
-      </div>
-    </div>
-    <button class="btn btn-primary" onclick="save4()">Show My Result →</button>
-  </div>`;
-}
+// ---------- SCREEN 5: Animated reveal ----------
+function step5(){
+  stopPolling();
+  setProgress(4);
 
-async function save4() {
-  S.days = +document.getElementById('days').value;
-  S.mins = +document.getElementById('mins').value;
-  if (!S.days || !S.mins) return;
+  const oldMin = bookTime(S.t1, S.pages);
+  const newMin = bookTime(S.t2, S.pages);
+  const saved = Math.max(0, oldMin - newMin);
+  const savedStr = fmtSaved(saved);
+  const unitLabel = (savedStr === '1' || savedStr === '1.0') ? 'hour' : 'hours';
 
-  document.getElementById("app").innerHTML = `<div class="card"><div class="loading-wrap"><div class="spinner"></div><div class="loading-text">Calculating your reading plan…</div></div></div>`;
+  const connImproved = S.conn === 'yes' || S.conn === 'some';
+  const undImproved = S.und === 'yes' || S.und === 'some';
+  const speedImproved = S.t1 > 0 && S.t2 > S.t1;
 
-  setTimeout(async () => {
-    let oldTime=bookTime(S.t1,S.pages), newTime=bookTime(S.t2,S.pages);
-    let oldDays=Math.ceil((oldTime/S.mins/S.days)*7);
-    let newDays=Math.ceil((newTime/S.mins/S.days)*7);
-    let perDay=Math.round(newTime/7);
+  const statusHtml = (improved) => improved
+    ? '<span class="tick-status improved"><span class="check">&#10003;</span>Improved</span>'
+    : '<span class="tick-status same"><span class="check">&mdash;</span>Same</span>';
 
-    await sendToSheet({ action:'submit', name:S.name, step:'completed' });
-
-    document.getElementById("app").innerHTML = `
+  document.getElementById('app').innerHTML = `
     <div class="card">
-      <div class="card-title">Your Transformation</div>
-      <div class="compare">
-        <div class="compare-card compare-old"><div class="compare-label">❌ Before</div><div class="compare-val">${oldDays}</div><div class="result-unit">days</div></div>
-        <div class="compare-card compare-new"><div class="compare-label">✅ After</div><div class="compare-val">${newDays}</div><div class="result-unit">days</div></div>
+      <div class="reveal-stack">
+        <div class="tick" id="tk1">
+          <div class="tick-icon">&#128279;</div>
+          <div class="tick-body"><div class="tick-title">Connection</div></div>
+          ${statusHtml(connImproved)}
+        </div>
+        <div class="tick" id="tk2">
+          <div class="tick-icon">&#128161;</div>
+          <div class="tick-body"><div class="tick-title">Understanding</div></div>
+          ${statusHtml(undImproved)}
+        </div>
+        <div class="tick" id="tk3">
+          <div class="tick-icon">&#9889;</div>
+          <div class="tick-body">
+            <div class="tick-title">Reading Speed</div>
+            <div class="tick-detail"><span class="strike">${S.t1} WPM</span><span class="arrow">&rarr;</span>${S.t2} WPM</div>
+          </div>
+          ${statusHtml(speedImproved)}
+        </div>
       </div>
-    </div>
-    <div class="cta-card">
-      <div class="cta-emoji">🔥</div>
-      <div class="result-label">With Your New Speed of ${S.t2} WPM</div>
-      <div class="result-value" style="font-size:22px;margin:8px 0 4px">${S.name}, you can finish "${S.book}" in just 7 days</div>
-      <div class="divider" style="background:rgba(255,255,255,0.12);margin:16px 0"></div>
-      <p class="insight-text">By reading just <b style="color:#c9a96e;font-size:18px">${perDay} minutes/day</b></p>
-      <p class="insight-text" style="margin-top:8px">Same book. Same you. <b>Just a faster reading speed.</b></p>
-    </div>
-    <button class="btn btn-secondary" onclick="redoHabit()">↻ Edit Reading Habit</button>`;
-  }, 1400);
+      <div class="reveal-finale" id="finale">
+        <span class="star">&#11088;</span>
+        <div class="saved">You saved ${savedStr}<span class="unit">${unitLabel}</span></div>
+      </div>
+      <div class="reveal-sub" id="sub">
+        Without trying to read faster.<br>Just by connecting differently.
+      </div>
+      <div class="reveal-closer" id="closer">
+        The book didn't change. You changed your approach.
+      </div>
+    </div>`;
+
+  sendToSheet({action:'submit', name:S.name, step:'completed'});
+
+  const reveal = (id, delay) => setTimeout(() => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('show');
+  }, delay);
+  reveal('tk1', 200);
+  reveal('tk2', 1200);
+  reveal('tk3', 2200);
+  reveal('finale', 3400);
+  reveal('sub', 4400);
+  reveal('closer', 5400);
 }
-function redoHabit() { step4(); }
 
 step1();
 </script>
