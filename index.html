@@ -127,6 +127,11 @@ body{
   color:var(--muted);letter-spacing:0;margin-left:6px;
 }
 .result-value.coral{color:var(--coral)}
+.result-note{
+  font-size:13px;color:var(--muted);
+  margin-top:10px;font-weight:500;
+  letter-spacing:0.1px;
+}
 .divider{height:1px;background:var(--border);margin:4px 0}
 
 /* ----- Single-question screen ----- */
@@ -214,9 +219,10 @@ body{
 }
 .tick-body{flex:1;min-width:0}
 .tick-title{font-size:14.5px;font-weight:600;color:var(--ink)}
-.tick-detail{font-size:12px;color:var(--muted);margin-top:3px}
+.tick-detail{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.45}
 .tick-detail .strike{text-decoration:line-through;text-decoration-color:var(--faint);margin-right:4px}
 .tick-detail .arrow{color:var(--coral);margin:0 6px;font-weight:600}
+.tick-detail-sub{font-size:11.5px;color:var(--faint);margin-top:2px;font-weight:500}
 .tick-status{font-size:13px;font-weight:600;flex-shrink:0;display:flex;align-items:center;gap:7px}
 .tick-status.improved{color:var(--green)}
 .tick-status.same{color:var(--muted)}
@@ -238,6 +244,11 @@ body{
   font-family:'DM Sans',sans-serif;font-size:18px;font-weight:500;
   color:var(--coral-soft);letter-spacing:0;margin-left:6px;
 }
+.reveal-finale .saved-context{
+  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;
+  color:var(--ink-soft);margin-top:12px;letter-spacing:0.1px;
+}
+.reveal-finale .saved-context .arrow{color:var(--coral);font-weight:700;margin:0 6px}
 .reveal-sub{text-align:center;margin-top:20px;font-size:14px;color:var(--ink-soft);line-height:1.6;opacity:0}
 .reveal-sub.show{animation:tickIn .6s ease-out forwards}
 .reveal-closer{
@@ -320,6 +331,15 @@ function fmtHours(mins){return (mins/60).toFixed(1)}
 function fmtSaved(mins){
   const h = mins/60;
   return h >= 10 ? String(Math.round(h)) : h.toFixed(1);
+}
+function fmtHr(mins){
+  const h = mins / 60;
+  const s = h.toFixed(1);
+  return s.endsWith('.0') ? s.slice(0, -2) : s;
+}
+function pagesPer5Min(wpm){
+  if (wpm <= 0) return 0;
+  return Math.max(1, Math.round((wpm * 5) / WPP));
 }
 function setProgress(step){
   for (let i = 1; i <= 4; i++){
@@ -468,7 +488,7 @@ async function save1(){
   btn.disabled = true;
   btn.textContent = 'Joining...';
 
-  await sendToSheet({action:'submit', name, book, pages, step:'registered'});
+  await sendToSheet({action:'register', name, book, pages});
 
   const open = await checkUnlock('t1');
   if (open) step2();
@@ -532,22 +552,21 @@ function step2_q2(){
 
 async function showT1Results(){
   await sendToSheet({
-    action:'submit',
+    action:'t1_done',
     name:S.name,
-    t1:S.t1,
+    wpm:S.t1,
     t1q1:S.t1q1,
-    t1q1Label:labelFor('t1q1', S.t1q1),
-    t1q2:S.t1q2,
-    t1q2Label:labelFor('t1q2', S.t1q2),
-    step:'t1_done'
+    t1q2:S.t1q2
   });
 
   const hours = fmtHours(bookTime(S.t1, S.pages));
+  const pagesT1 = pagesPer5Min(S.t1);
   document.getElementById('app').innerHTML = `
     <div class="card">
       <div class="result-row">
         <div class="result-label">Your reading speed</div>
         <div class="result-value">${S.t1}<span class="unit">WPM</span></div>
+        <div class="result-note">About ${pagesT1} ${pagesT1 === 1 ? 'page' : 'pages'} every 5 minutes</div>
       </div>
       <div class="divider"></div>
       <div class="result-row">
@@ -625,14 +644,11 @@ function step4_q2(){
   renderQuestion('t2q2', 2, 2, 'Reveal My Results →', async value => {
     S.t2q2 = value;
     await sendToSheet({
-      action:'submit',
+      action:'t2_done',
       name:S.name,
-      t2:S.t2,
+      wpm:S.t2,
       t2q1:S.t2q1,
-      t2q1Label:labelFor('t2q1', S.t2q1),
-      t2q2:S.t2q2,
-      t2q2Label:labelFor('t2q2', S.t2q2),
-      step:'t2_done'
+      t2q2:S.t2q2
     });
     step5();
   });
@@ -651,11 +667,12 @@ function step5(){
   const savedStr = fmtSaved(saved);
   const unitLabel = (savedStr === '1' || savedStr === '1.0') ? 'hour' : 'hours';
 
-  // All T2 question options are positive, so Connection and Understanding
-  // always show "Improved" when the participant has answered.
   const connImproved = !!S.t2q1;
   const undImproved = !!S.t2q2;
   const speedImproved = S.t1 > 0 && S.t2 > S.t1;
+
+  const pagesT1 = pagesPer5Min(S.t1);
+  const pagesT2 = pagesPer5Min(S.t2);
 
   const statusHtml = (improved) => improved
     ? '<span class="tick-status improved"><span class="check">&#10003;</span>Improved</span>'
@@ -679,6 +696,7 @@ function step5(){
           <div class="tick-body">
             <div class="tick-title">Reading Speed</div>
             <div class="tick-detail"><span class="strike">${S.t1} WPM</span><span class="arrow">&rarr;</span>${S.t2} WPM</div>
+            <div class="tick-detail-sub">${pagesT1} &rarr; ${pagesT2} pages every 5 min</div>
           </div>
           ${statusHtml(speedImproved)}
         </div>
@@ -686,6 +704,7 @@ function step5(){
       <div class="reveal-finale" id="finale">
         <span class="star">&#11088;</span>
         <div class="saved">You saved ${savedStr}<span class="unit">${unitLabel}</span></div>
+        <div class="saved-context">${fmtHr(oldMin)} hr at your old pace<span class="arrow">&rarr;</span>${fmtHr(newMin)} hr at your new pace</div>
       </div>
       <div class="reveal-sub" id="sub">
         Without trying to read faster.<br>Just by connecting differently.
@@ -695,7 +714,7 @@ function step5(){
       </div>
     </div>`;
 
-  sendToSheet({action:'submit', name:S.name, step:'completed'});
+
 
   const reveal = (id, delay) => setTimeout(() => {
     const el = document.getElementById(id);
